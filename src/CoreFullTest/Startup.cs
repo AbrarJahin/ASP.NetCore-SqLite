@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using CoreFullTest.Data;
 using CoreFullTest.Models;
 using CoreFullTest.Services;
+using Microsoft.Data.Sqlite;
+using CoreFullTest.Model;
 
 namespace CoreFullTest
 {
@@ -45,12 +47,19 @@ namespace CoreFullTest
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
+            var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "mcp.db" };
+            var connectionString = connectionStringBuilder.ToString();
+
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite (connectionString));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddDbContext<McpDbContext>(options =>
+               options.UseSqlite(connectionString));
 
             services.AddMvc();
 
